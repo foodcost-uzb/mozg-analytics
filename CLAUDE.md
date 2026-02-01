@@ -109,6 +109,30 @@ docker-compose exec db psql -U mozg mozg_analytics  # DB shell
 - `POST /api/v1/venues/{id}/sync` - Trigger data sync
 - `GET /api/v1/venues/{id}/sync/status` - Get sync status
 
+### Reports - Sales
+- `GET /api/v1/reports/sales/summary` - Sales summary for period
+- `GET /api/v1/reports/sales/daily` - Daily sales breakdown
+- `GET /api/v1/reports/sales/comparison` - Compare with previous period
+- `GET /api/v1/reports/sales/by-venue` - Sales by venue
+- `GET /api/v1/reports/sales/hourly` - Hourly sales breakdown
+- `GET /api/v1/reports/sales/plan-fact` - Plan vs actual comparison
+- `GET /api/v1/reports/sales/top-days` - Top days by revenue
+- `GET /api/v1/reports/sales/weekday-analysis` - Average by day of week
+
+### Reports - Menu Analysis
+- `GET /api/v1/reports/menu/abc` - ABC analysis (by revenue/profit/quantity)
+- `GET /api/v1/reports/menu/margin` - Product margin analysis
+- `GET /api/v1/reports/menu/go-list` - Go-List recommendations matrix
+- `GET /api/v1/reports/menu/top-sellers` - Top selling products
+- `GET /api/v1/reports/menu/worst-sellers` - Worst selling products
+- `GET /api/v1/reports/menu/categories` - Category breakdown
+
+### Export
+- `GET /api/v1/reports/export/sales` - Export sales report to Excel
+- `GET /api/v1/reports/export/abc` - Export ABC analysis to Excel
+- `GET /api/v1/reports/export/go-list` - Export Go-List to Excel
+- `GET /api/v1/reports/export/margin` - Export margin analysis to Excel
+
 ## iiko Integration
 
 The platform integrates with iiko Cloud API:
@@ -135,16 +159,23 @@ Set these in venue `pos_config`:
 - CRUD for organizations, venues, users
 - iiko sync service with Celery tasks
 
-### Phase 2: Basic Reports (Next)
-- SalesReport: revenue by periods, comparisons
-- MenuAnalysisReport: ABC analysis, margins
-- Excel/PDF export
-- Redis caching
+### Phase 2: Basic Reports ✅
+- SalesReportService: summary, daily, hourly, comparison, by-venue
+- MenuAnalysisService: ABC analysis, XYZ analysis, margin analysis
+- Go-List matrix with recommendations (Stars, Workhorses, Puzzles, Dogs)
+- Top/worst sellers, category analysis
+- Excel export (openpyxl) for all reports
+- Redis caching service
+- Unit tests for report services
 
-### Phase 3: Web Dashboard
-- Vue.js 3 + TypeScript
-- Pinia state management
-- ECharts visualizations
+### Phase 3: Web Dashboard ✅
+- Vue.js 3 + Vite + TypeScript
+- Pinia stores (auth, venues, filters)
+- Vue Router with auth guards
+- Tailwind CSS styling
+- ECharts visualizations (Line, Bar, Pie, Heatmap)
+- Reusable components (StatCard, DataTable, DateRangePicker)
+- Views: Dashboard, Sales, Menu (ABC/Go-List), Settings, Login
 
 ### Phase 4: Advanced Analytics
 - Motive Marketing analysis

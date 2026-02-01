@@ -1,8 +1,8 @@
 # MOZG Analytics - Project Handoff
 
 **Дата:** 2026-02-01
-**Статус:** Phase 1 завершена
-**Готовность:** MVP Backend готов к развёртыванию
+**Статус:** Phase 3 завершена
+**Готовность:** Full-stack приложение готово к развёртыванию
 
 ---
 
@@ -59,9 +59,13 @@ mozg-analytics/
 │   │   │   ├── sync/
 │   │   │   │   ├── iiko_sync.py     # Сервис синхронизации iiko
 │   │   │   │   └── tasks.py         # Celery задачи
-│   │   │   ├── reports/             # [Phase 2]
-│   │   │   ├── analytics/           # [Phase 4]
-│   │   │   └── export/              # [Phase 2]
+│   │   │   ├── reports/
+│   │   │   │   ├── sales.py         # SalesReportService
+│   │   │   │   └── menu.py          # MenuAnalysisService (ABC/XYZ/Go-List)
+│   │   │   ├── export/
+│   │   │   │   └── excel.py         # ExcelExportService
+│   │   │   ├── cache.py             # Redis кеширование
+│   │   │   └── analytics/           # [Phase 4]
 │   │   └── main.py                  # FastAPI приложение
 │   ├── alembic/
 │   │   ├── env.py
@@ -75,7 +79,20 @@ mozg-analytics/
 │   ├── requirements.txt
 │   ├── Dockerfile
 │   └── .env.example
-├── frontend/                         # [Phase 3 - Vue.js]
+├── frontend/                         # Vue.js 3 Dashboard
+│   ├── src/
+│   │   ├── api/                      # Axios API клиент
+│   │   ├── components/               # UI компоненты
+│   │   │   ├── layout/               # AppHeader, AppSidebar
+│   │   │   ├── common/               # StatCard, DataTable, DateRangePicker
+│   │   │   └── charts/               # ECharts компоненты
+│   │   ├── stores/                   # Pinia stores
+│   │   ├── views/                    # Dashboard, Sales, Menu, Settings, Login
+│   │   ├── router/                   # Vue Router
+│   │   └── types/                    # TypeScript типы
+│   ├── package.json
+│   ├── vite.config.ts
+│   └── tailwind.config.js
 ├── telegram/                         # [Phase 6 - Bot + Mini App]
 ├── docker-compose.yml
 ├── CLAUDE.md                         # Документация для разработки
@@ -142,6 +159,36 @@ organizations (мультитенант)
 | POST | `/{id}/sync` | manager | Запустить синхронизацию |
 | GET | `/{id}/sync/status` | any | Статус синхронизации |
 
+### Отчёты по продажам `/api/v1/reports/sales`
+| Метод | Endpoint | Описание |
+|-------|----------|----------|
+| GET | `/summary` | Сводка продаж за период |
+| GET | `/daily` | Ежедневная разбивка |
+| GET | `/comparison` | Сравнение с прошлым периодом |
+| GET | `/by-venue` | Разбивка по заведениям |
+| GET | `/hourly` | Почасовая аналитика |
+| GET | `/plan-fact` | План/факт выполнения |
+| GET | `/top-days` | Топ дней по выручке |
+| GET | `/weekday-analysis` | Анализ по дням недели |
+
+### Анализ меню `/api/v1/reports/menu`
+| Метод | Endpoint | Описание |
+|-------|----------|----------|
+| GET | `/abc` | ABC-анализ (по выручке/прибыли/количеству) |
+| GET | `/margin` | Маржинальность продуктов |
+| GET | `/go-list` | Go-List матрица рекомендаций |
+| GET | `/top-sellers` | Топ продаваемых блюд |
+| GET | `/worst-sellers` | Аутсайдеры меню |
+| GET | `/categories` | Анализ по категориям |
+
+### Экспорт `/api/v1/reports/export`
+| Метод | Endpoint | Описание |
+|-------|----------|----------|
+| GET | `/sales` | Экспорт продаж в Excel |
+| GET | `/abc` | Экспорт ABC-анализа в Excel |
+| GET | `/go-list` | Экспорт Go-List в Excel |
+| GET | `/margin` | Экспорт маржинальности в Excel |
+
 ---
 
 ## 5. iiko Интеграция
@@ -177,9 +224,15 @@ organizations (мультитенант)
 cd mozg-analytics
 docker compose up -d
 
-# Проверка
+# Проверка API
 curl http://localhost:8000/health
 # Swagger UI: http://localhost:8000/docs
+
+# Frontend (отдельно)
+cd frontend
+npm install
+npm run dev
+# Dashboard: http://localhost:3000
 ```
 
 ### Локально
@@ -253,8 +306,9 @@ pytest --cov=app --cov-report=html
 
 ---
 
-## 9. Что сделано (Phase 1) ✅
+## 9. Что сделано
 
+### Phase 1: Фундамент ✅
 - [x] Структура проекта
 - [x] Docker Compose (PostgreSQL, Redis, API, Celery)
 - [x] SQLAlchemy модели с миграциями
@@ -267,18 +321,31 @@ pytest --cov=app --cov-report=html
 - [x] Базовые тесты
 - [x] Документация (CLAUDE.md)
 
+### Phase 2: Базовые отчёты ✅
+- [x] SalesReportService: summary, daily, hourly, comparison, by-venue, plan-fact
+- [x] MenuAnalysisService: ABC-анализ, XYZ-анализ, маржинальность
+- [x] Go-List матрица рекомендаций (Stars, Workhorses, Puzzles, Dogs)
+- [x] Top/worst sellers, category analysis
+- [x] Excel экспорт (openpyxl) для всех отчётов
+- [x] Redis кеширование (CacheService)
+- [x] API endpoints (20+ эндпоинтов)
+- [x] Unit тесты для сервисов отчётов
+
 ---
 
 ## 10. Что нужно сделать
 
-### Phase 2: Базовые отчёты
-- [ ] SalesReport: выручка по периодам, сравнение
-- [ ] MenuAnalysisReport: ABC-анализ, маржинальность
-- [ ] Excel экспорт (openpyxl)
-- [ ] PDF экспорт (reportlab)
-- [ ] Redis кеширование отчётов
+### Phase 3: Web Dashboard ✅
+- [x] Vue.js 3 + Vite + TypeScript проект
+- [x] Tailwind CSS стилизация
+- [x] Pinia stores (auth, venues, filters)
+- [x] Vue Router с auth guards
+- [x] API клиент с axios (token refresh)
+- [x] ECharts графики (Line, Bar, Pie, Heatmap)
+- [x] Компоненты: StatCard, DataTable, DateRangePicker, VenueSelector
+- [x] Views: Dashboard, Sales, Menu, Settings, Login
 
-### Phase 3: Web Dashboard
+### Phase 4: Advanced Analytics (Next)
 - [ ] Vue.js 3 + TypeScript проект
 - [ ] Pinia stores
 - [ ] ECharts графики
