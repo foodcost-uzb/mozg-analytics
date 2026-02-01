@@ -345,13 +345,7 @@ pytest --cov=app --cov-report=html
 - [x] Компоненты: StatCard, DataTable, DateRangePicker, VenueSelector
 - [x] Views: Dashboard, Sales, Menu, Settings, Login
 
-### Phase 4: Advanced Analytics (Next)
-- [ ] Vue.js 3 + TypeScript проект
-- [ ] Pinia stores
-- [ ] ECharts графики
-- [ ] Dashboard, Sales, Menu, Settings views
-
-### Phase 4: Продвинутая аналитика
+### Phase 4: Продвинутая аналитика (Next)
 - [ ] Motive Marketing (6 факторов)
 - [ ] P&L отчёт
 - [ ] HR-аналитика
@@ -414,4 +408,217 @@ open http://localhost:8000/docs
 
 ---
 
-*Документ создан автоматически. Актуален на момент завершения Phase 1.*
+## 13. История разработки (Changelog)
+
+### Commit e1e462a — Phase 1: Foundation (2026-02-01)
+
+**Фундамент BI-платформы — 45 файлов, +4399 строк**
+
+#### Backend Core
+| Файл | Описание |
+|------|----------|
+| `app/main.py` | FastAPI приложение с CORS, lifespan, /health |
+| `app/core/config.py` | Pydantic Settings с валидацией окружения |
+| `app/core/security.py` | JWT токены (access/refresh), bcrypt пароли, Telegram OAuth HMAC |
+| `app/core/celery_app.py` | Celery + Redis broker, расписание задач (crontab) |
+
+#### Database Layer
+| Файл | Описание |
+|------|----------|
+| `app/db/base.py` | Базовые классы: UUIDMixin, TimestampMixin |
+| `app/db/models.py` | 10 SQLAlchemy моделей с relationships |
+| `app/db/session.py` | Async session factory (asyncpg) |
+| `alembic/versions/001_initial_schema.py` | Миграция: все таблицы + индексы |
+
+**Модели данных:**
+```
+Organization → users[], venues[]
+User         → organization, role (Enum: owner/admin/manager/analyst/viewer)
+Venue        → organization, pos_type (iiko/rkeeper), pos_config (JSONB)
+Category     → venue, products[]
+Product      → venue, category, price, cost_price, is_active
+Employee     → venue, external_id, name, role
+Receipt      → venue, receipt_items[], payment_type, discount
+ReceiptItem  → receipt, product, quantity, price, discount
+DailySales   → venue, date, revenue, orders_count, avg_check
+HourlySales  → venue, date, hour, revenue, orders_count
+```
+
+#### API Endpoints
+| Файл | Endpoints | Описание |
+|------|-----------|----------|
+| `app/api/v1/auth.py` | 5 | register, login, telegram, refresh, me |
+| `app/api/v1/organizations.py` | 6 | CRUD организации + управление пользователями |
+| `app/api/v1/venues.py` | 7 | CRUD заведений + sync endpoints |
+| `app/api/deps.py` | — | get_current_user, require_roles, RBAC декораторы |
+| `app/api/v1/schemas.py` | — | 25+ Pydantic схем (request/response) |
+
+#### iiko Integration
+| Файл | Описание |
+|------|----------|
+| `app/integrations/iiko/client.py` | Async HTTP клиент с retry (tenacity) |
+| `app/integrations/iiko/schemas.py` | Pydantic схемы для iiko API |
+
+**IikoClient методы:**
+- `_ensure_token()` — автообновление токена (TTL 60 мин)
+- `get_organizations()` — список организаций
+- `get_nomenclature()` — категории и продукты
+- `get_employees()` — сотрудники
+- `get_olap_report()` — продажи (OLAP)
+
+#### Sync Service
+| Файл | Описание |
+|------|----------|
+| `app/services/sync/iiko_sync.py` | IikoSyncService: full/incremental sync |
+| `app/services/sync/tasks.py` | Celery tasks с async wrapper |
+
+**Celery задачи:**
+| Задача | Расписание | Описание |
+|--------|------------|----------|
+| `sync_venue_data` | manual | Синхронизация одного заведения |
+| `full_sync_all_venues` | 3:00 daily | Полная синхронизация всех |
+| `incremental_sync_all_venues` | */15 min | Инкрементальная (последний час) |
+| `aggregate_daily_sales` | 0:05 daily | Агрегация в daily_sales |
+
+#### Infrastructure
+| Файл | Описание |
+|------|----------|
+| `docker-compose.yml` | PostgreSQL, Redis, API, Celery Worker, Celery Beat |
+| `backend/Dockerfile` | Python 3.9-slim + uvicorn |
+| `backend/requirements.txt` | 25 зависимостей |
+| `backend/.env.example` | Шаблон переменных окружения |
+
+#### Tests
+| Файл | Тесты |
+|------|-------|
+| `tests/conftest.py` | pytest fixtures: async db, test client, auth helpers |
+| `tests/test_auth.py` | register, login, /me endpoints |
+| `tests/test_venues.py` | CRUD venues, permissions |
+
+---
+
+### Commit fd075be — Phase 2 & 3 (2026-02-01)
+
+**Отчёты + Vue.js Dashboard — 51 файл, +7113 строк**
+
+#### Phase 2: Reports Backend
+
+| Файл | Описание |
+|------|----------|
+| `app/services/reports/sales.py` | SalesReportService |
+| `app/services/reports/menu.py` | MenuAnalysisService |
+| `app/services/export/excel.py` | ExcelExportService |
+| `app/services/cache.py` | CacheService (Redis) |
+| `app/api/v1/reports.py` | 20+ API endpoints |
+
+**SalesReportService методы:**
+| Метод | Возврат | Описание |
+|-------|---------|----------|
+| `get_summary()` | SalesSummary | Выручка, чеки, средний чек за период |
+| `get_daily()` | list[DailySalesData] | Разбивка по дням |
+| `get_comparison()` | SalesComparison | Сравнение с прошлым периодом (%, delta) |
+| `get_by_venue()` | list[VenueSalesData] | Выручка по заведениям |
+| `get_hourly()` | list[HourlySalesData] | Почасовая разбивка |
+| `get_plan_fact()` | PlanFactData | План/факт выполнения |
+| `get_top_days()` | list[TopDayData] | Топ дней по выручке |
+| `get_weekday_analysis()` | list[WeekdayData] | Средние по дням недели |
+
+**MenuAnalysisService методы:**
+| Метод | Описание |
+|-------|----------|
+| `abc_analysis(by='revenue')` | ABC классификация (A=80%, B=95%, C=остаток) |
+| `xyz_analysis()` | XYZ по коэффициенту вариации (X<10%, Y<25%, Z>25%) |
+| `margin_analysis()` | Маржинальность: (price-cost)/price * 100 |
+| `go_list()` | Матрица: Stars/Workhorses/Puzzles/Dogs/Potential/Standard |
+| `top_sellers(limit)` | Топ продаж по количеству |
+| `worst_sellers(limit)` | Аутсайдеры меню |
+| `category_analysis()` | Разбивка по категориям |
+
+**Go-List матрица:**
+```
+                 High Margin    Low Margin
+High Sales    →    Stars         Workhorses
+Low Sales     →    Puzzles       Dogs
+New Items     →    Potential     Standard
+```
+
+**ExcelExportService:**
+- Стилизация: цвета для ABC/Go-List, границы, auto-width колонок
+- Форматы: export_sales(), export_abc(), export_go_list(), export_margin()
+
+**CacheService:**
+- Custom JSONEncoder для Decimal, date, datetime, UUID
+- `@cached(ttl, key_builder)` декоратор
+- Методы: get(), set(), delete(), invalidate_pattern()
+
+#### Phase 3: Vue.js Frontend
+
+| Категория | Файлы |
+|-----------|-------|
+| Config | package.json, vite.config.ts, tsconfig.json, tailwind.config.js |
+| API Client | src/api/client.ts, auth.ts, venues.ts, reports.ts |
+| Stores | src/stores/auth.ts, venues.ts, filters.ts |
+| Router | src/router/index.ts (auth guards) |
+| Types | src/types/index.ts (TypeScript interfaces) |
+
+**Компоненты:**
+
+| Компонент | Описание |
+|-----------|----------|
+| `AppHeader.vue` | Navbar с user menu, venue selector |
+| `AppSidebar.vue` | Навигация: Dashboard, Sales, Menu, Settings |
+| `StatCard.vue` | KPI карточка с иконкой, значением, delta % |
+| `DataTable.vue` | Таблица с сортировкой, пагинацией |
+| `DateRangePicker.vue` | Выбор периода с presets (сегодня, неделя, месяц) |
+| `VenueSelector.vue` | Dropdown выбора заведения |
+| `LineChart.vue` | ECharts линейный график |
+| `BarChart.vue` | ECharts столбчатый график |
+| `PieChart.vue` | ECharts круговая диаграмма |
+| `HeatmapChart.vue` | ECharts тепловая карта (часы × дни) |
+
+**Views:**
+
+| View | Функционал |
+|------|------------|
+| `LoginView.vue` | Email/password форма, remember me |
+| `DashboardView.vue` | KPI cards, revenue chart, top products, hourly heatmap |
+| `SalesView.vue` | Tabs: overview, daily, venues, hourly + Excel export |
+| `MenuView.vue` | Tabs: ABC analysis, Go-List, margins, categories |
+| `SettingsView.vue` | Profile, venue management, iiko integration |
+
+**Axios клиент:**
+- Interceptor: auto-attach Bearer token
+- Response interceptor: 401 → refresh token → retry request
+- Base URL: `/api/v1` (Vite proxy в dev)
+
+**Pinia Stores:**
+| Store | State | Actions |
+|-------|-------|---------|
+| auth | user, token, isAuthenticated | login, logout, refreshToken, init |
+| venues | venues[], selectedVenue | fetchVenues, selectVenue |
+| filters | dateRange, quickFilter | setDateRange, setQuickFilter |
+
+---
+
+## 14. Архитектурные решения
+
+### Backend
+1. **Async everywhere**: SQLAlchemy 2.0 async, httpx async, Celery с async wrapper
+2. **Multi-tenant**: organization_id во всех таблицах, RBAC через deps.py
+3. **Aggregate tables**: daily_sales/hourly_sales для быстрых отчётов
+4. **JSONB configs**: pos_config и settings для гибкости без миграций
+
+### Frontend
+1. **Composition API**: `<script setup>` во всех компонентах
+2. **Pinia**: Reactive stores с persist (localStorage)
+3. **ECharts**: vue-echarts wrapper для реактивных графиков
+4. **Tailwind**: Utility-first CSS с dark mode support
+
+### Integration
+1. **Token auto-refresh**: iiko (60 мин TTL), JWT (configurable)
+2. **Retry logic**: tenacity с exponential backoff
+3. **Graceful errors**: IikoAPIError с status_code
+
+---
+
+*Документ обновлён: 2026-02-01. Phase 3 завершена.*
