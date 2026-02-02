@@ -21,6 +21,9 @@
 
 ### Git история
 ```
+f76f074 fix: SQLAlchemy Enum to use lowercase values for PostgreSQL
+6a3c854 fix: Python 3.9 compatibility and missing dependencies
+442f14d docs: Complete project handoff documentation
 551836e feat: Phase 6 - Telegram Bot Integration
 b5c2255 feat: Phase 5 - Forecasting (Revenue, Demand, Anomaly Detection)
 533bb62 docs: Complete project handoff with Phase 4 details
@@ -490,8 +493,16 @@ pytest --cov=app --cov-report=html
 
 ---
 
-## 11. Известные ограничения
+## 11. Известные ограничения и исправления
 
+### Исправлено (2026-02-02)
+1. **Python 3.9 совместимость**: Заменён синтаксис `X | Y` на `Union[X, Y]` в type hints
+2. **SQLAlchemy Enum**: Добавлен `values_callable` для корректной работы с PostgreSQL enum (lowercase)
+3. **httpx версия**: Исправлен конфликт версий с python-telegram-bot
+4. **Alembic миграции**: Использован синхронный engine вместо async для миграций
+5. **get_user_venue_ids**: Добавлена недостающая функция в deps.py
+
+### Текущие ограничения
 1. **bcrypt версия**: Используется 4.0.1 для совместимости с passlib
 2. **Python 3.9**: Тестировалось на 3.9.6, для 3.11+ возможны изменения в типах
 3. **iiko OLAP**: Упрощённая реализация, для production нужна детальная обработка чеков
@@ -1063,6 +1074,17 @@ A: `cd backend && alembic revision --autogenerate -m "description"`
 1. Читайте `CLAUDE.md` — техническая документация
 2. Swagger UI: `http://localhost:8000/docs`
 3. Тесты — лучшая документация поведения
+
+---
+
+## 🔗 Репозиторий
+
+**GitHub**: https://github.com/foodcost-uzb/mozg-analytics
+
+```bash
+git clone https://github.com/foodcost-uzb/mozg-analytics.git
+cd mozg-analytics
+```
 
 ---
 
