@@ -95,7 +95,10 @@ class User(Base, UUIDMixin, TimestampMixin):
     avatar_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
 
     # Access
-    role: Mapped[UserRole] = mapped_column(Enum(UserRole), default=UserRole.VIEWER)
+    role: Mapped[UserRole] = mapped_column(
+        Enum(UserRole, values_callable=lambda x: [e.value for e in x]),
+        default=UserRole.VIEWER
+    )
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     last_login_at: Mapped[Optional[datetime]] = mapped_column(nullable=True)
 
@@ -132,7 +135,10 @@ class Venue(Base, UUIDMixin, TimestampMixin):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
     # POS Configuration
-    pos_type: Mapped[POSType] = mapped_column(Enum(POSType), nullable=False)
+    pos_type: Mapped[POSType] = mapped_column(
+        Enum(POSType, values_callable=lambda x: [e.value for e in x]),
+        nullable=False
+    )
     pos_config: Mapped[dict] = mapped_column(JSONB, default=dict)
     # For iiko: {"organization_id": "...", "api_login": "..."}
     # For rkeeper: {"server_url": "...", "api_key": "..."}
@@ -140,7 +146,8 @@ class Venue(Base, UUIDMixin, TimestampMixin):
     # Sync status
     last_sync_at: Mapped[Optional[datetime]] = mapped_column(nullable=True)
     sync_status: Mapped[SyncStatus] = mapped_column(
-        Enum(SyncStatus), default=SyncStatus.PENDING
+        Enum(SyncStatus, values_callable=lambda x: [e.value for e in x]),
+        default=SyncStatus.PENDING
     )
     sync_error: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
