@@ -3,17 +3,17 @@
 from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 
-def format_currency(amount: Decimal | float, symbol: str = "₽") -> str:
+def format_currency(amount: Union[Decimal, float], symbol: str = "₽") -> str:
     """Format currency amount."""
     if isinstance(amount, Decimal):
         amount = float(amount)
     return f"{amount:,.0f} {symbol}".replace(",", " ")
 
 
-def format_percent(value: Decimal | float, show_sign: bool = True) -> str:
+def format_percent(value: Union[Decimal, float], show_sign: bool = True) -> str:
     """Format percentage value."""
     if isinstance(value, Decimal):
         value = float(value)
@@ -21,7 +21,7 @@ def format_percent(value: Decimal | float, show_sign: bool = True) -> str:
     return f"{sign}{value:.1f}%"
 
 
-def format_number(value: int | float) -> str:
+def format_number(value: Union[int, float]) -> str:
     """Format large number with spaces."""
     if isinstance(value, float):
         return f"{value:,.1f}".replace(",", " ")

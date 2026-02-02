@@ -1,13 +1,13 @@
-from typing import Optional
+from typing import List, Optional
 import uuid
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from sqlalchemy import select
+from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.security import decode_token, TokenPayload
-from app.db.models import User, UserRole
+from app.db.models import User, UserRole, Venue
 from app.db.session import get_db
 
 security = HTTPBearer()
@@ -91,3 +91,24 @@ require_manager = require_roles(UserRole.OWNER, UserRole.ADMIN, UserRole.MANAGER
 require_analyst = require_roles(
     UserRole.OWNER, UserRole.ADMIN, UserRole.MANAGER, UserRole.ANALYST
 )
+
+
+async def get_user_venue_ids(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> List[uuid.UUID]:
+    """Get list of venue IDs accessible to current user."""
+    # If user has allowed_venue_ids set, use those
+    if current_user.allowed_venue_ids:
+        return [uuid.UUID(v) for v in current_user.allowed_venue_ids]
+
+    # Otherwise, get all venues for user's organization
+    result = await db.execute(
+        select(Venue.id).where(
+            and_(
+                Venue.organization_id == current_user.organization_id,
+                Venue.is_active == True,
+            )
+        )
+    )
+    return list(result.scalars().all())
