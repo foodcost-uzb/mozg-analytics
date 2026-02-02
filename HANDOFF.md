@@ -1,8 +1,8 @@
 # MOZG Analytics - Project Handoff
 
-**Дата:** 2026-02-01
-**Статус:** Phase 3 завершена
-**Готовность:** Full-stack приложение готово к развёртыванию
+**Дата:** 2026-02-02
+**Статус:** Phase 4 завершена
+**Готовность:** Full-stack приложение с продвинутой аналитикой
 
 ---
 
@@ -345,11 +345,11 @@ pytest --cov=app --cov-report=html
 - [x] Компоненты: StatCard, DataTable, DateRangePicker, VenueSelector
 - [x] Views: Dashboard, Sales, Menu, Settings, Login
 
-### Phase 4: Продвинутая аналитика (Next)
-- [ ] Motive Marketing (6 факторов)
-- [ ] P&L отчёт
-- [ ] HR-аналитика
-- [ ] Basket analysis
+### Phase 4: Продвинутая аналитика ✅
+- [x] Motive Marketing (6 факторов: weekday, seasonality, events, pricing)
+- [x] P&L отчёт (revenue, COGS, gross profit, operating expenses, EBITDA)
+- [x] HR-аналитика (employee rankings, shift analysis, productivity)
+- [x] Basket analysis (product pairs, cross-sell, category affinity)
 
 ### Phase 5: Прогнозирование
 - [ ] Prophet для прогноза выручки
@@ -600,6 +600,88 @@ New Items     →    Potential     Standard
 
 ---
 
+### Commit (pending) — Phase 4: Advanced Analytics (2026-02-02)
+
+**Продвинутая аналитика — 6 файлов, ~2500 строк**
+
+#### Motive Marketing Service (`app/services/analytics/motive.py`)
+| Метод | Описание |
+|-------|----------|
+| `analyze_weekdays()` | Анализ продаж по дням недели с индексами |
+| `analyze_seasonality()` | Месячная сезонность с YoY сравнением |
+| `analyze_events()` | Влияние праздников на продажи |
+| `analyze_pricing()` | Анализ влияния изменения цен + эластичность |
+| `get_full_report()` | Полный отчёт с рекомендациями |
+
+**6 факторов влияния:**
+- Weekday patterns (индексы по дням недели)
+- Seasonality (месячные тренды)
+- Events/Holidays (праздники РФ)
+- Pricing (эластичность спроса)
+- Weather (placeholder)
+- Marketing (placeholder)
+
+#### P&L Report Service (`app/services/analytics/pnl.py`)
+| Метод | Описание |
+|-------|----------|
+| `calculate_revenue_breakdown()` | Разбивка выручки по категориям |
+| `calculate_cogs()` | Cost of Goods Sold из receipt_items |
+| `calculate_summary()` | Полный P&L summary |
+| `get_daily_pnl()` | Ежедневный тренд маржи |
+| `get_margin_trend()` | Месячный тренд маржинальности |
+
+**P&L метрики:**
+```
+Gross Revenue → Discounts → Net Revenue
+                                ↓
+                              COGS
+                                ↓
+                          Gross Profit
+                                ↓
+                    Operating Expenses (Labor, Rent, Marketing)
+                                ↓
+                             EBITDA
+                                ↓
+                    Depreciation + Taxes
+                                ↓
+                          Net Profit
+```
+
+#### HR Analytics Service (`app/services/analytics/hr.py`)
+| Метод | Описание |
+|-------|----------|
+| `get_employee_metrics()` | Метрики каждого сотрудника |
+| `get_employee_comparisons()` | Сравнение с средним |
+| `analyze_shifts()` | Анализ по сменам (утро/день/вечер) |
+| `get_hourly_productivity()` | Почасовая продуктивность |
+| `calculate_team_metrics()` | Командные метрики |
+
+**Performance Levels:** TOP (80%+), ABOVE_AVG (60-80%), AVERAGE (40-60%), BELOW_AVG (20-40%), LOW (<20%)
+
+#### Basket Analysis Service (`app/services/analytics/basket.py`)
+| Метод | Описание |
+|-------|----------|
+| `calculate_product_pairs()` | Часто покупаемые вместе (Apriori) |
+| `generate_cross_sell_recommendations()` | Рекомендации допродаж |
+| `calculate_category_affinity()` | Связь между категориями |
+| `calculate_basket_profile()` | Профиль корзины |
+| `analyze_time_patterns()` | Паттерны по времени |
+
+**Association Rule Metrics:**
+- **Support**: P(A ∩ B) — доля чеков с обоими товарами
+- **Confidence**: P(B|A) — вероятность B при наличии A
+- **Lift**: отношение к случайному — >1 означает связь
+
+#### API Endpoints (`app/api/v1/analytics.py`)
+| Группа | Endpoints | Описание |
+|--------|-----------|----------|
+| `/motive` | report, weekdays, seasonality | Motive Marketing |
+| `/pnl` | report, margin-trend | P&L отчёты |
+| `/hr` | report, rankings | HR аналитика |
+| `/basket` | report, product-pairs, cross-sell | Basket analysis |
+
+---
+
 ## 14. Архитектурные решения
 
 ### Backend
@@ -621,4 +703,4 @@ New Items     →    Potential     Standard
 
 ---
 
-*Документ обновлён: 2026-02-01. Phase 3 завершена.*
+*Документ обновлён: 2026-02-02. Phase 4 завершена.*

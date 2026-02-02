@@ -133,6 +133,24 @@ docker-compose exec db psql -U mozg mozg_analytics  # DB shell
 - `GET /api/v1/reports/export/go-list` - Export Go-List to Excel
 - `GET /api/v1/reports/export/margin` - Export margin analysis to Excel
 
+### Analytics - Motive Marketing
+- `GET /api/v1/analytics/motive/report` - Full Motive Marketing report
+- `GET /api/v1/analytics/motive/weekdays` - Weekday analysis
+- `GET /api/v1/analytics/motive/seasonality` - Monthly seasonality
+
+### Analytics - P&L
+- `GET /api/v1/analytics/pnl/report` - Complete P&L report
+- `GET /api/v1/analytics/pnl/margin-trend` - Monthly margin trend
+
+### Analytics - HR
+- `GET /api/v1/analytics/hr/report` - Complete HR analytics report
+- `GET /api/v1/analytics/hr/rankings` - Employee rankings
+
+### Analytics - Basket
+- `GET /api/v1/analytics/basket/report` - Complete basket analysis
+- `GET /api/v1/analytics/basket/product-pairs` - Product pairs (association rules)
+- `GET /api/v1/analytics/basket/cross-sell` - Cross-sell recommendations
+
 ## iiko Integration
 
 The platform integrates with iiko Cloud API:
@@ -177,10 +195,11 @@ Set these in venue `pos_config`:
 - Reusable components (StatCard, DataTable, DateRangePicker)
 - Views: Dashboard, Sales, Menu (ABC/Go-List), Settings, Login
 
-### Phase 4: Advanced Analytics
-- Motive Marketing analysis
-- P&L report
-- HR analytics
+### Phase 4: Advanced Analytics ✅
+- Motive Marketing analysis (weekday, seasonality, events, pricing)
+- P&L report (revenue breakdown, COGS, margins, EBITDA)
+- HR analytics (employee rankings, shifts, productivity)
+- Basket analysis (product pairs, cross-sell, category affinity)
 
 ### Phase 5: Forecasting
 - Prophet revenue forecasting
