@@ -39,9 +39,9 @@ const handleLogout = () => {
     <div class="h-16 flex items-center px-6 border-b border-gray-200 dark:border-gray-700">
       <div class="flex items-center space-x-3">
         <div class="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-          <span class="text-white font-bold text-sm">M</span>
+          <span class="text-white font-bold text-xs">SCH</span>
         </div>
-        <span class="text-lg font-semibold text-gray-900 dark:text-white">MOZG</span>
+        <span class="text-lg font-semibold text-gray-900 dark:text-white">SCH</span>
       </div>
     </div>
 

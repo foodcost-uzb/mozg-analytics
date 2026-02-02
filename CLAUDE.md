@@ -1,8 +1,8 @@
-# MOZG Analytics - BI Platform for Restaurant Business
+# SMART CONTROL HUB - BI Platform for Restaurant Business
 
 ## Project Overview
 
-MOZG Analytics is a comprehensive BI analytics platform for the restaurant business, similar to MOZG REST. It provides real-time sales analytics, menu analysis, forecasting, and reporting capabilities.
+SMART CONTROL HUB is a comprehensive BI analytics platform for the restaurant business, similar to MOZG REST. It provides real-time sales analytics, menu analysis, forecasting, and reporting capabilities.
 
 ## Architecture
 

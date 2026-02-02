@@ -27,7 +27,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator:
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
-    description="BI Analytics Platform for Restaurant Business",
+    description="SMART CONTROL HUB - BI Analytics Platform for Restaurant Business",
     openapi_url=f"{settings.API_V1_PREFIX}/openapi.json",
     docs_url="/docs",
     redoc_url="/redoc",

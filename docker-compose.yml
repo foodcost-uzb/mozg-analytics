@@ -3,7 +3,7 @@ version: '3.8'
 services:
   db:
     image: postgres:15-alpine
-    container_name: mozg-postgres
+    container_name: sch-postgres
     environment:
       POSTGRES_USER: mozg
       POSTGRES_PASSWORD: mozg_secret_password
@@ -20,7 +20,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: mozg-redis
+    container_name: sch-redis
     ports:
       - "6379:6379"
     volumes:
@@ -35,7 +35,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: mozg-api
+    container_name: sch-api
     ports:
       - "8000:8000"
     environment:
@@ -56,7 +56,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: mozg-celery-worker
+    container_name: sch-celery-worker
     environment:
       DATABASE_URL: postgresql+asyncpg://mozg:mozg_secret_password@db:5432/mozg_analytics
       REDIS_URL: redis://redis:6379/0
@@ -74,7 +74,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: mozg-celery-beat
+    container_name: sch-celery-beat
     environment:
       DATABASE_URL: postgresql+asyncpg://mozg:mozg_secret_password@db:5432/mozg_analytics
       REDIS_URL: redis://redis:6379/0

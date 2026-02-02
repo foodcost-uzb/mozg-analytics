@@ -1,4 +1,4 @@
-# MOZG Analytics - Project Handoff
+# SMART CONTROL HUB - Project Handoff
 
 **Дата:** 2026-02-02
 **Статус:** ✅ ВСЕ ФАЗЫ ЗАВЕРШЕНЫ
@@ -30,7 +30,7 @@ b5c2255 feat: Phase 5 - Forecasting (Revenue, Demand, Anomaly Detection)
 325ef7d feat: Phase 4 - Advanced Analytics (Motive, P&L, HR, Basket)
 5ddb403 docs: Add detailed development history to HANDOFF.md
 fd075be feat: Phase 2 & 3 - Reports API and Vue.js Dashboard
-e1e462a feat: Phase 1 - Foundation for MOZG Analytics BI platform
+e1e462a feat: Phase 1 - Foundation for SMART CONTROL HUB BI platform
 ```
 
 ---
@@ -80,7 +80,7 @@ e1e462a feat: Phase 1 - Foundation for MOZG Analytics BI platform
 
 ## 1. Обзор проекта
 
-**MOZG Analytics** — BI-платформа для ресторанного бизнеса, аналог MOZG REST.
+**SMART CONTROL HUB** — BI-платформа для ресторанного бизнеса, аналог MOZG REST.
 
 ### Цели проекта
 - Интеграция с POS-системами (iiko, R-Keeper)

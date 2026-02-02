@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     )
 
     # Application
-    APP_NAME: str = "MOZG Analytics"
+    APP_NAME: str = "SMART CONTROL HUB"
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = False
     API_V1_PREFIX: str = "/api/v1"

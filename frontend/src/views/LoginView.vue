@@ -39,10 +39,10 @@ const handleSubmit = async () => {
       <!-- Logo -->
       <div class="text-center">
         <div class="mx-auto w-16 h-16 bg-primary-600 rounded-2xl flex items-center justify-center">
-          <span class="text-white font-bold text-2xl">M</span>
+          <span class="text-white font-bold text-xl">SCH</span>
         </div>
         <h2 class="mt-6 text-3xl font-bold text-gray-900 dark:text-white">
-          MOZG Analytics
+          SMART CONTROL HUB
         </h2>
         <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
           Sign in to your account

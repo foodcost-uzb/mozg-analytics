@@ -300,7 +300,7 @@ def format_morning_report(
 ) -> str:
     """Format morning report notification."""
     message = f"""
-☀️ <b>Доброе утро! Сводка MOZG Analytics</b>
+☀️ <b>Доброе утро! Сводка SMART CONTROL HUB</b>
 
 📊 <b>Вчера:</b>
 💰 Выручка: {format_currency(yesterday_revenue)}
