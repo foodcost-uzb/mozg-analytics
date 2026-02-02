@@ -9,6 +9,7 @@ celery_app = Celery(
     backend=settings.CELERY_RESULT_BACKEND,
     include=[
         "app.services.sync.tasks",
+        "app.telegram.tasks",
     ],
 )
 
@@ -16,7 +17,7 @@ celery_app.conf.update(
     task_serializer="json",
     accept_content=["json"],
     result_serializer="json",
-    timezone="UTC",
+    timezone="Europe/Moscow",  # Moscow timezone for reports
     enable_utc=True,
     task_track_started=True,
     task_time_limit=3600,  # 1 hour
@@ -41,5 +42,20 @@ celery_app.conf.beat_schedule = {
     "aggregate-daily-sales": {
         "task": "app.services.sync.tasks.aggregate_daily_sales",
         "schedule": crontab(hour=0, minute=5),
+    },
+    # Telegram: Morning reports at 9:00 AM Moscow
+    "telegram-morning-reports": {
+        "task": "telegram.send_morning_reports",
+        "schedule": crontab(hour=9, minute=0),
+    },
+    # Telegram: Evening reports at 10:00 PM Moscow
+    "telegram-evening-reports": {
+        "task": "telegram.send_evening_reports",
+        "schedule": crontab(hour=22, minute=0),
+    },
+    # Telegram: Check anomalies every 2 hours
+    "telegram-anomaly-check": {
+        "task": "telegram.check_and_send_anomalies",
+        "schedule": crontab(minute=0, hour="*/2"),
     },
 }

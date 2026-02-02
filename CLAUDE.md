@@ -163,6 +163,16 @@ docker-compose exec db psql -U mozg mozg_analytics  # DB shell
 - `GET /api/v1/forecasting/anomalies/report` - Full anomaly detection report
 - `GET /api/v1/forecasting/anomalies/recent` - Recent anomalies for alerts
 
+### Telegram Integration
+- `POST /api/v1/telegram/webhook` - Telegram webhook handler
+- `POST /api/v1/telegram/webhook/setup` - Set up webhook URL
+- `DELETE /api/v1/telegram/webhook` - Remove webhook
+- `POST /api/v1/telegram/link` - Link Telegram account via code
+- `DELETE /api/v1/telegram/link` - Unlink Telegram account
+- `GET /api/v1/telegram/notifications/settings` - Get notification settings
+- `PATCH /api/v1/telegram/notifications/settings` - Update notification settings
+- `GET /api/v1/telegram/bot/info` - Get bot information
+
 ## iiko Integration
 
 The platform integrates with iiko Cloud API:
@@ -218,10 +228,11 @@ Set these in venue `pos_config`:
 - DemandForecastService: Product demand prediction
 - AnomalyDetectionService: Z-score based anomaly detection
 
-### Phase 6: Telegram Integration
-- Extended bot commands
-- Push notifications
-- Mini App updates
+### Phase 6: Telegram Integration ✅
+- Extended bot commands (/start, /sales, /today, /week, /forecast, /alerts, /venues, /report, /settings, /link)
+- Push notifications (morning/evening reports, anomaly alerts, goal achievements)
+- Inline keyboards navigation
+- Account linking via code
 
 ## Environment Variables
 

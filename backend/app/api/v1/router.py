@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.api.v1 import auth, organizations, venues, reports, analytics, forecasting
+from app.api.v1 import auth, organizations, venues, reports, analytics, forecasting, telegram_webhook
 
 api_router = APIRouter()
 
@@ -10,3 +10,4 @@ api_router.include_router(venues.router)
 api_router.include_router(reports.router)
 api_router.include_router(analytics.router, prefix="/analytics", tags=["analytics"])
 api_router.include_router(forecasting.router, prefix="/forecasting", tags=["forecasting"])
+api_router.include_router(telegram_webhook.router)

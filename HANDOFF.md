@@ -1,8 +1,8 @@
 # MOZG Analytics - Project Handoff
 
 **Дата:** 2026-02-02
-**Статус:** Phase 5 завершена
-**Готовность:** Full-stack приложение с ML-прогнозированием
+**Статус:** Phase 6 завершена
+**Готовность:** Полноценная BI-платформа с Telegram интеграцией
 
 ---
 
@@ -72,6 +72,16 @@ mozg-analytics/
 │   │   │       ├── pnl.py           # P&L Report Service
 │   │   │       ├── hr.py            # HR Analytics
 │   │   │       └── basket.py        # Basket Analysis
+│   │   ├── telegram/
+│   │   │   ├── bot.py               # TelegramBot class + setup
+│   │   │   ├── handlers/
+│   │   │   │   ├── commands.py      # /start, /sales, /forecast, etc.
+│   │   │   │   └── callbacks.py     # Inline keyboard handlers
+│   │   │   ├── keyboards.py         # Inline keyboards
+│   │   │   ├── formatters.py        # Message formatters
+│   │   │   ├── services.py          # TelegramUserService
+│   │   │   ├── notifications.py     # NotificationService
+│   │   │   └── tasks.py             # Celery tasks for notifications
 │   │   └── main.py                  # FastAPI приложение
 │   ├── alembic/
 │   │   ├── env.py
@@ -209,6 +219,18 @@ organizations (мультитенант)
 | Basket | `/basket/product-pairs` | Связанные товары |
 | Basket | `/basket/cross-sell` | Рекомендации допродаж |
 
+### Telegram `/api/v1/telegram`
+| Метод | Endpoint | Описание |
+|-------|----------|----------|
+| POST | `/webhook` | Telegram webhook handler |
+| POST | `/webhook/setup` | Настройка webhook URL |
+| DELETE | `/webhook` | Удаление webhook |
+| POST | `/link` | Привязка Telegram аккаунта |
+| DELETE | `/link` | Отвязка Telegram аккаунта |
+| GET | `/notifications/settings` | Настройки уведомлений |
+| PATCH | `/notifications/settings` | Обновление настроек |
+| GET | `/bot/info` | Информация о боте |
+
 ---
 
 ## 5. iiko Интеграция
@@ -325,6 +347,8 @@ pytest --cov=app --cov-report=html
 - `test_venues.py` — CRUD заведений
 - `test_reports.py` — сервисы отчётов (sales, menu)
 - `test_analytics.py` — продвинутая аналитика (motive, pnl, hr, basket)
+- `test_forecasting.py` — прогнозирование (revenue, demand, anomaly)
+- `test_telegram.py` — Telegram bot (formatters, keyboards, notifications)
 
 ---
 
@@ -378,10 +402,15 @@ pytest --cov=app --cov-report=html
 - [x] Прогноз спроса на блюда (DemandForecastService)
 - [x] Anomaly detection (AnomalyDetectionService с z-score)
 
-### Phase 6: Telegram
-- [ ] Расширенные команды бота
-- [ ] Push-уведомления
-- [ ] Mini App интерфейс
+### Phase 6: Telegram Integration ✅
+- [x] Telegram Bot с командами (/start, /sales, /today, /week, /forecast, /alerts, /venues, /report, /settings, /link)
+- [x] Inline keyboards для навигации
+- [x] NotificationService для push-уведомлений
+- [x] Утренний отчёт (9:00) и вечерний отчёт (22:00)
+- [x] Алерты об аномалиях
+- [x] Celery tasks для периодических уведомлений
+- [x] API endpoints для управления уведомлениями
+- [x] Привязка Telegram аккаунта через код
 
 ### Дополнительно
 - [ ] R-Keeper интеграция
@@ -725,4 +754,105 @@ Gross Revenue → Discounts → Net Revenue
 
 ---
 
-*Документ обновлён: 2026-02-02. Phase 4 завершена.*
+### Commit (Phase 5) — Forecasting (2026-02-02)
+
+**Прогнозирование с Prophet — 9 файлов, +2888 строк**
+
+#### RevenueForecastService (`app/services/forecasting/revenue.py`)
+| Метод | Описание |
+|-------|----------|
+| `forecast_revenue()` | Prophet прогноз с учётом сезонности |
+| `quick_forecast()` | Быстрый прогноз для dashboard |
+| `_prepare_holidays()` | Российские праздники для Prophet |
+| `_calculate_accuracy()` | MAPE, RMSE, MAE, R² метрики |
+
+#### DemandForecastService (`app/services/forecasting/demand.py`)
+| Метод | Описание |
+|-------|----------|
+| `forecast_product_demand()` | Прогноз спроса на продукт |
+| `forecast_all_products()` | Массовый прогноз (top N) |
+| `_calculate_trend()` | Определение тренда (up/down/stable) |
+
+#### AnomalyDetectionService (`app/services/forecasting/anomaly.py`)
+| Метод | Описание |
+|-------|----------|
+| `detect_daily_anomalies()` | Z-score anomalies |
+| `detect_product_anomalies()` | Аномалии в продажах продуктов |
+| `generate_report()` | Полный отчёт с рекомендациями |
+
+**Z-score пороги:**
+| Severity | Z-score |
+|----------|---------|
+| LOW | ≥ 2σ |
+| MEDIUM | ≥ 3σ |
+| HIGH | ≥ 4σ |
+| CRITICAL | ≥ 5σ |
+
+---
+
+### Commit (Phase 6) — Telegram Integration (2026-02-02)
+
+**Telegram бот и уведомления — 10 файлов, +1900 строк**
+
+#### Bot Commands (`app/telegram/handlers/commands.py`)
+| Команда | Описание |
+|---------|----------|
+| `/start` | Приветствие и главное меню |
+| `/help` | Справка по командам |
+| `/sales` | Выбор периода для отчёта |
+| `/today` | Продажи за сегодня |
+| `/week` | Продажи за неделю |
+| `/month` | Продажи за месяц |
+| `/forecast` | Прогноз выручки |
+| `/alerts` | Последние аномалии |
+| `/venues` | Список заведений |
+| `/report` | Выбор типа отчёта |
+| `/settings` | Настройки уведомлений |
+| `/link` | Привязка аккаунта |
+
+#### Inline Keyboards (`app/telegram/keyboards.py`)
+| Keyboard | Описание |
+|----------|----------|
+| `get_main_menu_keyboard()` | Главное меню |
+| `get_period_keyboard()` | Выбор периода |
+| `get_report_keyboard()` | Типы отчётов |
+| `get_settings_keyboard()` | Настройки уведомлений |
+| `get_venues_keyboard()` | Список заведений |
+
+#### NotificationService (`app/telegram/notifications.py`)
+| Метод | Описание |
+|-------|----------|
+| `send_morning_report()` | Утренний отчёт (9:00) |
+| `send_evening_report()` | Вечерний отчёт (22:00) |
+| `send_anomaly_alert()` | Алерт об аномалии |
+| `send_goal_achieved()` | Уведомление о достижении цели |
+| `send_sync_error()` | Ошибка синхронизации (admin only) |
+
+#### Celery Tasks (`app/telegram/tasks.py`)
+| Task | Schedule | Описание |
+|------|----------|----------|
+| `send_morning_reports` | 9:00 daily | Массовая рассылка утренних отчётов |
+| `send_evening_reports` | 22:00 daily | Массовая рассылка вечерних отчётов |
+| `check_and_send_anomalies` | */2 hours | Проверка и отправка алертов |
+
+#### API Endpoints (`app/api/v1/telegram_webhook.py`)
+| Endpoint | Описание |
+|----------|----------|
+| `POST /webhook` | Telegram updates handler |
+| `POST /webhook/setup` | Установка webhook URL |
+| `POST /link` | Привязка по коду |
+| `GET/PATCH /notifications/settings` | Настройки уведомлений |
+
+#### Message Formatters (`app/telegram/formatters.py`)
+| Formatter | Описание |
+|-----------|----------|
+| `format_sales_summary()` | Сводка продаж |
+| `format_forecast_message()` | Прогноз выручки |
+| `format_anomaly_alert()` | Алерт об аномалии |
+| `format_abc_report()` | ABC-анализ |
+| `format_morning_report()` | Утренний отчёт |
+| `format_evening_report()` | Вечерний итоги дня |
+
+---
+
+*Документ обновлён: 2026-02-02. Phase 6 завершена.*
