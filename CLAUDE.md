@@ -151,6 +151,18 @@ docker-compose exec db psql -U mozg mozg_analytics  # DB shell
 - `GET /api/v1/analytics/basket/product-pairs` - Product pairs (association rules)
 - `GET /api/v1/analytics/basket/cross-sell` - Cross-sell recommendations
 
+### Forecasting - Revenue
+- `GET /api/v1/forecasting/revenue/forecast` - Prophet-based revenue forecast
+- `GET /api/v1/forecasting/revenue/quick` - Quick forecast for dashboard
+
+### Forecasting - Demand
+- `GET /api/v1/forecasting/demand/forecast` - Product demand forecast
+- `GET /api/v1/forecasting/demand/product/{id}` - Single product forecast
+
+### Forecasting - Anomalies
+- `GET /api/v1/forecasting/anomalies/report` - Full anomaly detection report
+- `GET /api/v1/forecasting/anomalies/recent` - Recent anomalies for alerts
+
 ## iiko Integration
 
 The platform integrates with iiko Cloud API:
@@ -201,10 +213,10 @@ Set these in venue `pos_config`:
 - HR analytics (employee rankings, shifts, productivity)
 - Basket analysis (product pairs, cross-sell, category affinity)
 
-### Phase 5: Forecasting
-- Prophet revenue forecasting
-- Demand prediction
-- Anomaly detection
+### Phase 5: Forecasting ✅
+- RevenueForecastService: Prophet-based forecasting with seasonality
+- DemandForecastService: Product demand prediction
+- AnomalyDetectionService: Z-score based anomaly detection
 
 ### Phase 6: Telegram Integration
 - Extended bot commands

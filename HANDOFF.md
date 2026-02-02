@@ -1,8 +1,8 @@
 # MOZG Analytics - Project Handoff
 
 **Дата:** 2026-02-02
-**Статус:** Phase 4 завершена
-**Готовность:** Full-stack приложение с продвинутой аналитикой
+**Статус:** Phase 5 завершена
+**Готовность:** Full-stack приложение с ML-прогнозированием
 
 ---
 
@@ -373,10 +373,10 @@ pytest --cov=app --cov-report=html
 - [x] HR-аналитика (employee rankings, shift analysis, productivity)
 - [x] Basket analysis (product pairs, cross-sell, category affinity)
 
-### Phase 5: Прогнозирование
-- [ ] Prophet для прогноза выручки
-- [ ] Прогноз спроса на блюда
-- [ ] Anomaly detection
+### Phase 5: Прогнозирование ✅
+- [x] Prophet для прогноза выручки (RevenueForecastService)
+- [x] Прогноз спроса на блюда (DemandForecastService)
+- [x] Anomaly detection (AnomalyDetectionService с z-score)
 
 ### Phase 6: Telegram
 - [ ] Расширенные команды бота
