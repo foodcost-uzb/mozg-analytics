@@ -40,6 +40,8 @@ mozg-analytics/
 │   │   │       ├── auth.py          # Авторизация endpoints
 │   │   │       ├── organizations.py # Управление организацией
 │   │   │       ├── venues.py        # CRUD заведений
+│   │   │       ├── reports.py       # Отчёты endpoints
+│   │   │       ├── analytics.py     # Аналитика endpoints
 │   │   │       ├── schemas.py       # Pydantic схемы
 │   │   │       └── router.py        # Роутер API
 │   │   ├── core/
@@ -65,7 +67,11 @@ mozg-analytics/
 │   │   │   ├── export/
 │   │   │   │   └── excel.py         # ExcelExportService
 │   │   │   ├── cache.py             # Redis кеширование
-│   │   │   └── analytics/           # [Phase 4]
+│   │   │   └── analytics/
+│   │   │       ├── motive.py        # Motive Marketing (6 факторов)
+│   │   │       ├── pnl.py           # P&L Report Service
+│   │   │       ├── hr.py            # HR Analytics
+│   │   │       └── basket.py        # Basket Analysis
 │   │   └── main.py                  # FastAPI приложение
 │   ├── alembic/
 │   │   ├── env.py
@@ -189,6 +195,20 @@ organizations (мультитенант)
 | GET | `/go-list` | Экспорт Go-List в Excel |
 | GET | `/margin` | Экспорт маржинальности в Excel |
 
+### Аналитика `/api/v1/analytics`
+| Группа | Endpoint | Описание |
+|--------|----------|----------|
+| Motive | `/motive/report` | Полный отчёт 6 факторов |
+| Motive | `/motive/weekdays` | Анализ по дням недели |
+| Motive | `/motive/seasonality` | Сезонность |
+| P&L | `/pnl/report` | Полный P&L отчёт |
+| P&L | `/pnl/margin-trend` | Тренд маржинальности |
+| HR | `/hr/report` | HR аналитика |
+| HR | `/hr/rankings` | Рейтинг сотрудников |
+| Basket | `/basket/report` | Анализ корзины |
+| Basket | `/basket/product-pairs` | Связанные товары |
+| Basket | `/basket/cross-sell` | Рекомендации допродаж |
+
 ---
 
 ## 5. iiko Интеграция
@@ -303,6 +323,8 @@ pytest --cov=app --cov-report=html
 ### Текущие тесты
 - `test_auth.py` — регистрация, логин, /me
 - `test_venues.py` — CRUD заведений
+- `test_reports.py` — сервисы отчётов (sales, menu)
+- `test_analytics.py` — продвинутая аналитика (motive, pnl, hr, basket)
 
 ---
 
@@ -600,9 +622,9 @@ New Items     →    Potential     Standard
 
 ---
 
-### Commit (pending) — Phase 4: Advanced Analytics (2026-02-02)
+### Commit 325ef7d — Phase 4: Advanced Analytics (2026-02-02)
 
-**Продвинутая аналитика — 6 файлов, ~2500 строк**
+**Продвинутая аналитика — 10 файлов, +4128 строк**
 
 #### Motive Marketing Service (`app/services/analytics/motive.py`)
 | Метод | Описание |
